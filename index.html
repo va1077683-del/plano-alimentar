@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#16a34a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Plano Alimentar">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Plano Alimentar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Plano Alimentar</div>
+      <div class="topbar-sub" id="topbar-sub"></div>
+    </div>
+    <button class="icon-btn" id="config-btn" onclick="openConfigModal()" aria-label="Configurações">
+      <i class="ti ti-settings"></i>
+    </button>
+  </header>
+
+  <!-- PAGE: HOJE -->
+  <div id="page-home" class="page active">
+    <div class="summary-bar">
+      <div class="summary-grid">
+        <div class="metric">
+          <div class="metric-label">Consumido</div>
+          <div class="metric-value" id="cal-hoje">0 kcal</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Meta</div>
+          <div class="metric-value" id="meta-dia">1800 kcal</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Status meta</div>
+          <div class="metric-value neutral" id="status-meta">-1800</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Gasto basal</div>
+          <div class="metric-value" id="gasto-basal">2200 kcal</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span id="treino-badge" class="treino-badge">Nenhum treino</span>
+          <span id="pct-label">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Treino de hoje</span>
+      </div>
+      <div class="treino-chips" id="treino-chips">
+        <div class="chip active" data-treino="">Nenhum</div>
+        <div class="chip" data-treino="Musculação">Musculação</div>
+        <div class="chip" data-treino="Futebol">Futebol</div>
+        <div class="chip" data-treino="Caminhada">Caminhada</div>
+        <div class="chip" data-treino="Musculção+Caminhada">Musc + Caminhada</div>
+        <div class="chip" data-treino="Musculação+Futebol">Musc + Futebol</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Refeições de hoje</span>
+        <button class="add-btn" onclick="openAddModal()">
+          <i class="ti ti-plus"></i> Adicionar
+        </button>
+      </div>
+      <div id="meal-list">
+        <div class="empty-state">
+          <i class="ti ti-salad" style="font-size:36px;opacity:0.3;display:block;margin-bottom:8px;"></i>
+          Nenhum alimento registrado hoje.<br>Toque em "Adicionar" para começar.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: PESAGEM -->
+  <div id="page-peso" class="page">
+    <div class="stat-row">
+      <div class="stat-item">
+        <div class="stat-val" id="peso-atual">— kg</div>
+        <div class="stat-lbl">Peso atual</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val green" id="peso-perdido">— kg</div>
+        <div class="stat-lbl">Total perdido</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="media-diff">—</div>
+        <div class="stat-lbl">Média/pesagem</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Histórico</span>
+        <button class="add-btn" onclick="openPesagemModal()">
+          <i class="ti ti-plus"></i> Registrar
+        </button>
+      </div>
+      <div id="pesagem-list"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: ALIMENTOS -->
+  <div id="page-alimentos" class="page">
+    <div class="search-wrap">
+      <i class="ti ti-search search-icon"></i>
+      <input class="search-input" type="text" placeholder="Buscar alimento..." id="alimento-search" oninput="filtrarAlimentos()">
+    </div>
+    <div class="section" style="margin-top:0;border-top:none;">
+      <div class="section-header">
+        <span class="section-title">Banco de alimentos</span>
+        <button class="add-btn" onclick="openNovoAlimentoModal()">
+          <i class="ti ti-plus"></i> Novo
+        </button>
+      </div>
+      <div id="alimentos-list"></div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <button class="nav-item active" id="nav-home" onclick="navTo('home')">
+      <i class="ti ti-home"></i>
+      <span>Hoje</span>
+    </button>
+    <button class="nav-item" id="nav-peso" onclick="navTo('peso')">
+      <i class="ti ti-scale"></i>
+      <span>Pesagem</span>
+    </button>
+    <button class="nav-item" id="nav-alimentos" onclick="navTo('alimentos')">
+      <i class="ti ti-database"></i>
+      <span>Alimentos</span>
+    </button>
+  </nav>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
