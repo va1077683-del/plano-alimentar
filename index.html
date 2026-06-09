@@ -413,8 +413,11 @@ function refeicaoByHour() {
 
 function api(params) {
   if (!SCRIPT_URL) return Promise.reject(new Error('URL não configurada'));
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params).toString();
-  return fetch(url).then(r => r.json());
+  return fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params)
+  }).then(r => r.json());
 }
 
 function toast(msg, type='ok') {
